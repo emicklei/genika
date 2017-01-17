@@ -16,7 +16,7 @@ type Gotype struct {
 	TemplateName string
 }
 
-var toolHome = filepath.Join(os.Getenv("GOPATH"), "src", "github.com", "emicklei", "go-templates")
+var toolHome = filepath.Join(os.Getenv("GOPATH"), "src", "github.com", "emicklei", "genika", "gtg")
 
 var (
 	oBaseDir  = flag.String("base", toolHome, "location of template folders")
