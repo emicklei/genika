@@ -1,9 +1,5 @@
 # gtg - go template based go source generator
 
-Inspired by 
-- https://github.com/ncw/gotemplate
-- http://bouk.co/blog/idiomatic-generics-in-go/
-
 ### Install
 
 	go install

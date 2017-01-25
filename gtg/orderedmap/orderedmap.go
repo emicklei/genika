@@ -1,6 +1,6 @@
 package {{.Package}}
 
-// generated with github.com/emicklei/go-templates/{{.TemplateName}}
+// generated with github.com/emicklei/genika/gtg/{{.TemplateName}}
 
 import (
 	"bytes"
