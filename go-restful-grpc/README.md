@@ -5,3 +5,7 @@ Code generator that takes a .proto definition and generates a go-RESTful resourc
 # build
 
     go build -o $GOPATH/bin/grpcrest
+
+# run example
+
+    grpcrest example.proto    

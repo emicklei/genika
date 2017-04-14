@@ -31,7 +31,7 @@ import (
 )
 
 // {{.ServiceName}}Resource implements REST operations for {{.ServiceName}}.
-// {{.Doc}}
+//{{.Doc}}
 type {{.ServiceName}}Resource struct {
 	Server api.{{.ServiceName}}Server
 }
@@ -44,7 +44,7 @@ func (r {{.ServiceName}}Resource) WebService() *restful.WebService {
 	ws.Consumes(restful.MIME_JSON)
 	ws.Produces(restful.MIME_JSON)
 	{{range .Routes}}
-	ws.Route(ws.{{.HTTPMethod}}("{{.HTTPPath}}}").To(r.{{.ResourceOperation}}).
+	ws.Route(ws.{{.HTTPMethod}}("{{.HTTPPath}}").To(r.{{.ResourceOperation}}).
 		Doc("{{.Doc}}").
 		Returns(200,"OK",api.{{.OutputMessage}}{}).
 		DefaultReturns(500,"internal server error", restful.ServiceError{}).
@@ -58,7 +58,7 @@ func (r {{.ServiceName}}Resource) WebService() *restful.WebService {
 var operationsTemplate = template.Must(template.New("operationsTemplate").Parse(`
 {{range .Routes}}
 // {{.ResourceOperation}} is dispatched from {{.HTTPMethod}} {{.HTTPPath}}. 
-// {{.Doc}}
+//{{.Doc}}
 func (r {{.ServiceName}}Resource) {{.ResourceOperation}}(request *restful.Request, response *restful.Response) {
 	in := new(api.{{.InputMessage}})
 	if err := request.ReadEntity(in); err != nil {

@@ -19,13 +19,13 @@ func main() {
 	c := Collector{def}
 	srv := c.Services()
 	log.Println(srv[0].Name)
-	log.Println(c.RPCsOf(srv[0])[1].Name)
+	log.Println(c.RPCsOf(srv[0])[0].Name)
 
 	routes := []routeData{}
 	for _, each := range c.RPCsOf(srv[0]) {
 		comment := ""
 		if each.Comment != nil {
-			comment = each.Comment.Message
+			comment = each.Comment.Message()
 		}
 		if len(each.Options) > 0 {
 			m, p := httpMethodAndPath(each.Options)
