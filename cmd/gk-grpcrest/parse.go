@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -46,11 +45,17 @@ func main() {
 		APIPackage:  "account",
 		Routes:      routes,
 	}
-	fmt.Println(resourceTemplate.Execute(os.Stdout, d))
+	if err := resourceTemplate.Execute(os.Stdout, d); err != nil {
+		log.Fatalf("writing resource failed:%v", err)
+	}
 
-	fmt.Println(webserviceTemplate.Execute(os.Stdout, d))
+	if err := webserviceTemplate.Execute(os.Stdout, d); err != nil {
+		log.Fatalf("writing resource failed:%v", err)
+	}
 
-	fmt.Println(operationsTemplate.Execute(os.Stdout, d))
+	if err := operationsTemplate.Execute(os.Stdout, d); err != nil {
+		log.Fatalf("writing resource failed:%v", err)
+	}
 
 }
 

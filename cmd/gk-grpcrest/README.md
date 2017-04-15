@@ -4,8 +4,8 @@ Code generator that takes a .proto definition and generates a go-RESTful resourc
 
 # build
 
-    go build -o $GOPATH/bin/grpcrest
+    go install
 
 # run example
 
-    grpcrest example.proto    
+    gk-grpcrest example.proto    
