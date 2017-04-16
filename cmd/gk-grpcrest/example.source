@@ -1,0 +1,79 @@
+
+package rest
+
+import (
+	"context"
+	"net/http"
+
+	restful "github.com/emicklei/go-restful"
+	api "account"
+)
+
+// UserServiceResource implements REST operations for UserService.
+//
+type UserServiceResource struct {
+	Server api.UserServiceServer
+}
+
+// WebService returns a new restful.WebService with REST routes for UserService.
+func (r UserServiceResource) WebService() *restful.WebService {
+	ws := new(restful.WebService)
+	ws.Consumes(restful.MIME_JSON)
+	ws.Produces(restful.MIME_JSON)
+	
+	ws.Route(ws.GET("/v1/user?name={name}").To(r.GetUser).
+		Doc(" comment for GetUser").
+		Returns(200,"OK",api.GetUserReply{}).
+		DefaultReturns(500,"internal server error", restful.ServiceError{}).
+		Reads(api.GetUserRequest{}).
+		Writes(api.GetUserReply}{}))
+	
+	ws.Route(ws.POST("/v1/user").To(r.SaveUser).
+		Doc(" comment for SaveUser").
+		Returns(200,"OK",api.SaveUserResult{}).
+		DefaultReturns(500,"internal server error", restful.ServiceError{}).
+		Reads(api.SaveUserParams{}).
+		Writes(api.SaveUserResult}{}))
+	
+	return ws
+}
+
+
+// GetUser is dispatched from GET /v1/user?name={name}. 
+// comment for GetUser
+func (r UserServiceResource) GetUser(request *restful.Request, response *restful.Response) {
+	in := new(api.GetUserRequest)
+	if err := request.ReadEntity(in); err != nil {
+		out := restful.ServiceError{
+			Code:    http.StatusBadRequest,
+			Message: err.Error(),
+		}
+		response.WriteHeaderAndEntity(http.StatusBadRequest, out)
+		return
+	}
+	if out, err := r.Server.GetUser(request.Request.Context(), in); err != nil {
+		response.WriteHeaderAndEntity(http.StatusInternalServerError, err)
+		return
+	} 
+	response.WriteAsJson(out)	
+}
+
+// SaveUser is dispatched from POST /v1/user. 
+// comment for SaveUser
+func (r UserServiceResource) SaveUser(request *restful.Request, response *restful.Response) {
+	in := new(api.SaveUserParams)
+	if err := request.ReadEntity(in); err != nil {
+		out := restful.ServiceError{
+			Code:    http.StatusBadRequest,
+			Message: err.Error(),
+		}
+		response.WriteHeaderAndEntity(http.StatusBadRequest, out)
+		return
+	}
+	if out, err := r.Server.SaveUser(request.Request.Context(), in); err != nil {
+		response.WriteHeaderAndEntity(http.StatusInternalServerError, err)
+		return
+	} 
+	response.WriteAsJson(out)	
+}
+

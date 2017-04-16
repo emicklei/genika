@@ -2,21 +2,38 @@ syntax = "proto3";
 
 package test;
 
-// comment for UserRequest
-message UserRequest {
+// comment for GetUserRequest
+message GetUserRequest {
   string name = 1;
 }
-// comment for UserReply
-message UserReply {
+// comment for GetUserReply
+message GetUserReply {
   string name  = 1;
   string email = 2;
+}
+// comment for SaveUserParams
+message SaveUserParams {
+  string name  = 1;
+  string email = 2;
+}
+// comment for SaveUserResult
+message SaveUserResult {
+  bool ok = 1;
 }
 // comment for UserService
 service UserService {
   // comment for GetUser
-  rpc GetUser (UserRequest) returns (UserReply) {
-			option (google.api.http) = {
-				get: "/v1/account/{name}" 
-			};
+  rpc GetUser (GetUserRequest) returns (GetUserReply) {
+    option (google.api.http) = {
+      get: "/v1/user?name={name}"
+    };
+  
+  }
+  // comment for SaveUser
+  rpc SaveUser (SaveUserParams) returns (SaveUserResult) {
+    option (google.api.http) = {
+      post: "/v1/user"
+    };
+  
   }
 }
