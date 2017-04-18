@@ -1,4 +1,4 @@
-# command grpcrest
+# command gk-grpcrest
 
 Code generator that takes a .proto definition and generates a go-RESTful resource for each service.
 
@@ -8,4 +8,7 @@ Code generator that takes a .proto definition and generates a go-RESTful resourc
 
 # run example
 
-    gk-grpcrest example.proto    
+    gk-grpcrest example.proto
+
+# http options
+- https://github.com/googleapis/googleapis/blob/master/google/api/http.proto
