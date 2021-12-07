@@ -42,6 +42,7 @@ var url = flag.String("url", "http://localhost:8080", "the endpoint url against 
 
 // the {{.}}
 var {{.}} *forest.APITesting
+var _ = fmt.Println
 
 func init() {
 	flag.Parse()

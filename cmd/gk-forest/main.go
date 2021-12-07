@@ -5,6 +5,8 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+
+	"github.com/go-openapi/loads"
 )
 
 var (
@@ -24,6 +26,14 @@ func main() {
 	writeInit()
 	writeApiOperations()
 	if *oTests {
-		writeSampleTests()
+		//writeSampleTests()
 	}
+}
+
+func getDocument() *loads.Document {
+	doc, err := loads.Spec(*oSwaggerJsonUrl)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return doc
 }

@@ -30,8 +30,8 @@ func writeSampleTests() {
 	testHeader.Execute(out, header)
 
 	listing := getListing()
-	for _, each := range listing.Apis {
-		decl := getApiDeclaration(each.Path)
+	for path, each := range listing.Spec().Paths.Paths {
+		decl := getApiDeclaration(path)
 		for _, api := range decl.Apis {
 			for _, op := range api.Operations {
 				writeApiTest(api, op, out)

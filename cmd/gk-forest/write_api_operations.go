@@ -10,6 +10,8 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/go-openapi/spec"
 )
 
 func writeApiOperations() {
@@ -24,25 +26,27 @@ func writeApiOperations() {
 	header := HeaderData{Today: time.Now(), Source: *oSwaggerJsonUrl}
 	apiopHeader.Execute(out, header)
 
-	listing := getListing()
-	for _, each := range listing.Apis {
-		decl := getApiDeclaration(each.Path)
-		for _, api := range decl.Apis {
-			for _, op := range api.Operations {
-				writeApiOperation(api, op, out)
-			}
-		}
+	doc := getDocument()
+	for k, item := range doc.Spec().Paths.Paths {
+		writeApiOperation(k, item, item.Get, out)
+		writeApiOperation(k, item, item.Put, out)
+		writeApiOperation(k, item, item.Post, out)
+		writeApiOperation(k, item, item.Patch, out)
+		writeApiOperation(k, item, item.Head, out)
 	}
 	log.Printf("[forestgen] written %s\n", where)
 }
 
-func writeApiOperation(api Api, op Operation, out *os.File) {
+func writeApiOperation(path string, item spec.PathItem, op *spec.Operation, out *os.File) {
+	if op == nil {
+		return
+	}
 	data := apiopData{
-		Nickname:              op.Nickname,
-		Description:           html.UnescapeString(op.Summary),
+		Nickname:              getOperationName(op.ID),
+		Description:           fmt.Sprintf("%s\n%s", op.ID, html.UnescapeString(op.Description)),
 		ShortDescription:      strings.Replace(strings.Split(html.UnescapeString(op.Summary), "\n")[0], "\"", "'", -1),
-		HttpMethod:            op.GetMethod(),
-		Path:                  api.Path,
+		HttpMethod:            getMethod(item),
+		Path:                  path,
 		PathParameters:        pathParametersFrom(op),
 		QueryAndHeaderCalls:   configBuildCallsFrom(op),
 		ParametersDeclaration: parameterDeclarationFrom(op),
@@ -51,11 +55,37 @@ func writeApiOperation(api Api, op Operation, out *os.File) {
 	apiopTemplate.Execute(out, data)
 }
 
-func pathParametersFrom(op Operation) string {
+func getOperationName(op string) string {
+	if strings.Contains(op, "/") {
+		return "do" + fmt.Sprintf("%v", &op)
+	}
+	return op
+}
+
+func getMethod(item spec.PathItem) string {
+	if item.Get != nil {
+		return "GET"
+	}
+	if item.Put != nil {
+		return "PUT"
+	}
+	if item.Post != nil {
+		return "POST"
+	}
+	if item.Head != nil {
+		return "HEAD"
+	}
+	if item.Patch != nil {
+		return "PATCH"
+	}
+	panic("unknown method")
+}
+
+func pathParametersFrom(op *spec.Operation) string {
 	buf := new(bytes.Buffer)
 	for _, each := range op.Parameters {
 		pname := asParameterName(each.Name)
-		switch each.ParamType {
+		switch each.Type {
 		case "path":
 			buf.WriteString(", ")
 			buf.WriteString(pname)
@@ -64,11 +94,11 @@ func pathParametersFrom(op Operation) string {
 	return buf.String()
 }
 
-func configBuildCallsFrom(op Operation) string {
+func configBuildCallsFrom(op *spec.Operation) string {
 	buf := new(bytes.Buffer)
 	for _, each := range op.Parameters {
 		pname := asParameterName(each.Name)
-		switch each.ParamType {
+		switch each.Type {
 		case "query":
 			fmt.Fprintf(buf, ".\n\t\tQuery(%q,%s)", each.Name, pname)
 		case "header":
@@ -80,11 +110,11 @@ func configBuildCallsFrom(op Operation) string {
 	return buf.String()
 }
 
-func parameterDeclarationFrom(op Operation) string {
+func parameterDeclarationFrom(op *spec.Operation) string {
 	buf := new(bytes.Buffer)
 	for _, each := range op.Parameters {
 		buf.WriteString(", ")
-		fmt.Fprintf(buf, "%s %s", asParameterName(each.Name), asGoDatatype(*each.Type))
+		fmt.Fprintf(buf, "%s %s", asParameterName(each.Name), asGoDatatype(each.Type))
 	}
 	return buf.String()
 }
